@@ -41,7 +41,6 @@ def carve_png(fromfile, todir):
             break
 
         pngdata = data[idx1:idx2+4]
-
         outfilepath = os.path.join(todir, f'{idx1}.png')
 
         with open(outfilepath, 'wb') as outfile:
@@ -51,12 +50,39 @@ def carve_png(fromfile, todir):
         start = idx2 + 4
 
 
+def carve_base64_jpeg(fromfile, todir):
+    base64_jpeg_start = b'\x64\x61\x74\x61\x3a'
+    base64_jpeg_end = b'\x3d\x3d'
+
+    data = open(fromfile, 'rb').read()
+    start = 0
+    while True:
+        idx1 = data.find(base64_jpeg_start, start)
+        if idx1 < 0:
+            break
+        idx2 = data.find(base64_jpeg_end, idx1)
+        if idx2 < 0:
+            break
+
+        base64_jpeg = data[idx1:idx2+2]
+        base64_jpeg_str = base64_jpeg.decode('utf-8')
+        ouput_data = f"<img src={base64_jpeg_str} />"
+        outfilepath = os.path.join(todir, f'{idx1}.html')
+
+        with open(outfilepath, 'wb') as outfile:
+            outfile.write(ouput_data.encode('utf-8'))
+
+        print(f'Image saved to {outfilepath}')
+        start = idx2 + 2
+
+
 def carve_all(dump_dir, image_dir):
     for filename in os.listdir(dump_dir):
-        if filename.endswith(".data"):
+        if filename.endswith(".dump"):  # 파일 확장자는 경우에 따라 변경 (.data, .dump 등등)
             filepath = os.path.join(dump_dir, filename)
             carve_jpg(filepath, image_dir)
             carve_png(filepath, image_dir)
+            carve_base64_jpeg(filepath, image_dir)
 
 
 # usage example
