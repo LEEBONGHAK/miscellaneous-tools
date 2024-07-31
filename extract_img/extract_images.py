@@ -50,18 +50,19 @@ def carve_png(fromfile, todir):
         start = idx2 + 4
 
 
-# base64 폐기 (경우의 수가 많음) : 주의할 점 jpg를 base64화 하면 처음이 /9j/ 로 시작함
+# jpeg base64 폐기 (패턴없음) : 알아야할 점 jpg를 base64화 하면 처음이 /9j/ 로 시작함
+# png는 가능할지도?
 # def carve_base64(fromfile, todir):
-#     base64_jpeg_start = b'\x64\x61\x74\x61\x3a'
-#     base64_jpeg_end = b'\x3d'
+#     base64_png_start = b'\x64\x61\x74\x61\x3a'
+#     base64_png_end = b'\x3d'
 
 #     data = open(fromfile, 'rb').read()
 #     start = 0
 #     while True:
-#         idx1 = data.find(base64_jpeg_start, start)
+#         idx1 = data.find(base64_png_start, start)
 #         if idx1 < 0:
 #             break
-#         idx2 = data.find(base64_jpeg_end, idx1)
+#         idx2 = data.find(base64_png_end, idx1)
 #         if idx2 < 0:
 #             break
 
@@ -79,11 +80,14 @@ def carve_png(fromfile, todir):
 
 def carve_all(dump_dir, image_dir):
     for filename in os.listdir(dump_dir):
-        if filename.startswith("dump"):  # 폴더 내 파일 명에 따라 변경 (startswith(<start_string>) or endswitdh(<end_string>)) 
+        # 폴더 내 파일 명에 따라 변경 (startswith(<start_string>) or endswitdh(<end_string>))
+        if filename.startswith("dump"):
             filepath = os.path.join(dump_dir, filename)
             carve_jpg(filepath, image_dir)
             carve_png(filepath, image_dir)
+            # carve_base64(filepath, image_dir)
 
 
 # usage example
-carve_all('C:\\Users\\bhlee\\Downloads\\Test\\dump-7', 'C:\\Users\\bhlee\\Downloads\\Test\\image')
+carve_all('C:\\Users\\bhlee\\Downloads\\Test\\dump-5',
+          'C:\\Users\\bhlee\\Downloads\\Test\\image')
